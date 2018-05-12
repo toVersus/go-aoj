@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -33,112 +33,46 @@ func TestGetMaxProfitByFscan(t *testing.T) {
 	for _, testcase := range profitTests {
 		t.Log(testcase.name)
 
-		f, err := os.Create(testcase.file)
-		if err != nil {
-			t.Errorf("could not create a file: %s\n  %s", testcase.file, err)
-		}
-		f.WriteString(testcase.text)
-		f.Close()
-
-		f, err = os.Open(testcase.file)
-		if err != nil {
-			t.Errorf("could not open a file: %s\n  %s", testcase.file, err)
-		}
-
-		if result := getMaxProfitByFscan(f); !reflect.DeepEqual(result, testcase.want) {
+		r := strings.NewReader(testcase.text)
+		if result := getMaxProfitByFscan(r); !reflect.DeepEqual(result, testcase.want) {
 			t.Errorf("result => %#v\n, want => %#v", result, testcase.want)
-		}
-		f.Close()
-
-		if err := os.Remove(testcase.file); err != nil {
-			t.Errorf("could not delete a file: %s\n  %s\n", testcase.file, err)
 		}
 	}
 }
 
 func BenchmarkGetMaxProfitByFscan(b *testing.B) {
-	for _, testcase := range profitTests {
-		f, err := os.Create(testcase.file)
-		if err != nil {
-			b.Errorf("could not create a file: %s\n  %s", testcase.file, err)
-		}
-		f.WriteString(testcase.text)
-		f.Close()
-	}
-
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for _, testcase := range profitTests {
 			b.StopTimer()
-			f, _ := os.Open(testcase.file)
+			r := strings.NewReader(testcase.text)
 			b.StartTimer()
 
-			getMaxProfitByFscan(f)
-			f.Close()
+			getMaxProfitByFscan(r)
 		}
 	}
 	b.StopTimer()
-
-	for _, testcase := range profitTests {
-		if err := os.Remove(testcase.file); err != nil {
-			b.Errorf("could not delete a file: %s\n  %s\n", testcase.file, err)
-		}
-	}
 }
 
 func TestGetMaxProfitByScanner(t *testing.T) {
 	for _, testcase := range profitTests {
 		t.Log(testcase.name)
 
-		f, err := os.Create(testcase.file)
-		if err != nil {
-			t.Errorf("could not create a file: %s\n  %s", testcase.file, err)
-		}
-		f.WriteString(testcase.text)
-		f.Close()
-
-		f, err = os.Open(testcase.file)
-		if err != nil {
-			t.Errorf("could not open a file: %s\n  %s", testcase.file, err)
-		}
-
-		if result := getMaxProfitByScannerAtoi(f); !reflect.DeepEqual(result, testcase.want) {
+		r := strings.NewReader(testcase.text)
+		if result := getMaxProfitByScannerAtoi(r); !reflect.DeepEqual(result, testcase.want) {
 			t.Errorf("result => %#v\n, want => %#v", result, testcase.want)
-		}
-		f.Close()
-
-		if err := os.Remove(testcase.file); err != nil {
-			t.Errorf("could not delete a file: %s\n  %s\n", testcase.file, err)
 		}
 	}
 }
 
 func BenchmarkGetMaxProfitByScanner(b *testing.B) {
-	for _, testcase := range profitTests {
-		f, err := os.Create(testcase.file)
-		if err != nil {
-			b.Errorf("could not create a file: %s\n  %s", testcase.file, err)
-		}
-		f.WriteString(testcase.text)
-		f.Close()
-	}
-	b.ResetTimer()
-
 	for i := 0; i < b.N; i++ {
 		for _, testcase := range profitTests {
 			b.StopTimer()
-			f, _ := os.Open(testcase.file)
+			r := strings.NewReader(testcase.text)
 			b.StartTimer()
 
-			getMaxProfitByScannerAtoi(f)
-			f.Close()
-		}
-	}
-	b.StopTimer()
-
-	for _, testcase := range profitTests {
-		if err := os.Remove(testcase.file); err != nil {
-			b.Errorf("could not delete a file: %s\n  %s\n", testcase.file, err)
+			getMaxProfitByScannerAtoi(r)
 		}
 	}
 }

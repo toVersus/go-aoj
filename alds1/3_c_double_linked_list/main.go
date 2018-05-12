@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -84,9 +85,9 @@ func main() {
 }
 
 // runInst runs the bunch of instructions parsing from the input.
-func runInst(fd *os.File) error {
+func runInst(r io.Reader) error {
 	n := 0
-	sc := bufio.NewScanner(fd)
+	sc := bufio.NewScanner(r)
 	if sc.Scan() {
 		n, _ = strconv.Atoi(sc.Text())
 	}

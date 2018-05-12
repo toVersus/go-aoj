@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 )
@@ -11,12 +12,12 @@ func main() {
 	fmt.Println(getMaxProfitByFscan(os.Stdin))
 }
 
-func getMaxProfitByFscan(fd *os.File) int {
+func getMaxProfitByFscan(r io.Reader) int {
 	n, val, minv, maxv := 0, 0, 0, -2147483648
-	fmt.Fscan(fd, &n)
-	fmt.Fscan(fd, &minv)
+	fmt.Fscan(r, &n)
+	fmt.Fscan(r, &minv)
 	for i := 1; i < n; i++ {
-		fmt.Fscan(fd, &val)
+		fmt.Fscan(r, &val)
 		if maxv < val-minv {
 			maxv = val - minv
 		}
@@ -27,9 +28,9 @@ func getMaxProfitByFscan(fd *os.File) int {
 	return maxv
 }
 
-func getMaxProfitByScannerAtoi(fd *os.File) int {
+func getMaxProfitByScannerAtoi(r io.Reader) int {
 	n, val, minv, maxv := 0, 0, 0, -2147483648
-	sc := bufio.NewScanner(fd)
+	sc := bufio.NewScanner(r)
 	if sc.Scan() {
 		n, _ = strconv.Atoi(sc.Text())
 	}

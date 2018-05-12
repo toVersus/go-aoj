@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -11,14 +10,12 @@ import (
 
 var selectionSortTests = []struct {
 	name     string
-	file     string
 	text     string
 	want     []int
 	attempts int
 }{
 	{
 		name: "just print out the single input number without sorting",
-		file: "in1.txt",
 		text: `1
 100
 `,
@@ -27,7 +24,6 @@ var selectionSortTests = []struct {
 	},
 	{
 		name: "should print out the input numbers without sorting",
-		file: "in2.txt",
 		text: `5
 1 2 3 4 5
 `,
@@ -36,7 +32,6 @@ var selectionSortTests = []struct {
 	},
 	{
 		name: "should print out the sorted input numbers in maximum number of attempts",
-		file: "in3.txt",
 		text: `6
 6 5 4 3 2 1
 `,
@@ -45,7 +40,6 @@ var selectionSortTests = []struct {
 	},
 	{
 		name: "should print out the sorted 10 input numbers",
-		file: "in4.txt",
 		text: `10
 9 5 10 3 6 7 4 1 2 8
 `,
@@ -54,7 +48,6 @@ var selectionSortTests = []struct {
 	},
 	{
 		name: "should print out the sorted bunch of numbers getting from large input",
-		file: "in10.txt",
 		text: `100
 0 33 43 62 29 0 8 52 56 56 19 11 51 43 5 8 93 30 66 69 32 17 47 72 68 80 23 49 92 64 69 51 27 90 24 35 20 44 10 62 84 63 1 10 36 76 31 29 97 75 91 90 44 34 25 29 30 27 26 43 34 4 60 49 20 56 32 72 13 90 9 19 5 95 49 27 19 97 24 96 49 56 84 93 45 7 6 9 54 52 65 83 38 1 90 30 37 95 56 63
 `,
@@ -67,20 +60,10 @@ func TestSelectionSort(t *testing.T) {
 	for _, testcase := range selectionSortTests {
 		t.Log(testcase.name)
 
-		f, err := os.Create(testcase.file)
-		if err != nil {
-			t.Errorf("could not create a file: %s\n  %s", testcase.file, err)
-		}
-		f.WriteString(testcase.text)
-		f.Close()
-
-		f, err = os.Open(testcase.file)
-		if err != nil {
-			t.Errorf("could not open a file: %s\n  %s", testcase.file, err)
-		}
+		r := strings.NewReader(testcase.text)
 
 		N := 0
-		sc := bufio.NewScanner(f)
+		sc := bufio.NewScanner(r)
 		if sc.Scan() {
 			N, _ = strconv.Atoi(sc.Text())
 		}
@@ -90,7 +73,6 @@ func TestSelectionSort(t *testing.T) {
 				A[i], _ = strconv.Atoi(val)
 			}
 		}
-		f.Close()
 
 		result, counts := selectionSort(A, N)
 		if !reflect.DeepEqual(result, testcase.want) {
@@ -99,31 +81,18 @@ func TestSelectionSort(t *testing.T) {
 		if !reflect.DeepEqual(counts, testcase.attempts) {
 			t.Errorf("result => %#v\n, want => %#v", counts, testcase.attempts)
 		}
-
-		if err := os.Remove(testcase.file); err != nil {
-			t.Errorf("could not delete a file: %s\n  %s\n", testcase.file, err)
-		}
 	}
 }
 
 func BenchmarkSelectionSort(b *testing.B) {
-	for _, testcase := range selectionSortTests {
-		f, err := os.Create(testcase.file)
-		if err != nil {
-			b.Errorf("could not create a file: %s\n  %s", testcase.file, err)
-		}
-		f.WriteString(testcase.text)
-		f.Close()
-	}
-
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for _, testcase := range selectionSortTests {
 			b.StopTimer()
-			f, _ := os.Open(testcase.file)
+			r := strings.NewReader(testcase.text)
 			b.StartTimer()
 
-			sc := bufio.NewScanner(f)
+			sc := bufio.NewScanner(r)
 			N := 0
 			if sc.Scan() {
 				N, _ = strconv.Atoi(sc.Text())
@@ -134,15 +103,8 @@ func BenchmarkSelectionSort(b *testing.B) {
 					A[i], _ = strconv.Atoi(s)
 				}
 			}
-			f.Close()
 
 			selectionSort(A, N)
-		}
-	}
-
-	for _, testcase := range selectionSortTests {
-		if err := os.Remove(testcase.file); err != nil {
-			b.Errorf("could not delete a file: %s\n  %s\n", testcase.file, err)
 		}
 	}
 }

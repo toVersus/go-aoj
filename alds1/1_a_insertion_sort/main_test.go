@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -11,13 +10,11 @@ import (
 
 var insertionSortTests = []struct {
 	name string
-	file string
 	text string
 	want []int
 }{
 	{
 		name: "should be sorted gettint input from large file",
-		file: "in5.txt",
 		text: `100
 0 933 743 262 529 700 508 752 256 256 119 711 351 843 705 108 393 330 366 169 932 917 847 972 868 980 223 549 592 164 169 551 427 190 624 635 920 944 310 862 484 363 301 710 236 876 431 929 397 675 491 190 344 134 425 629 30 727 126 743 334 104 760 749 620 256 932 572 613 490 509 119 405 695 49 327 719 497 824 596 649 356 184 93 245 7 306 509 754 352 665 783 738 801 690 330 337 195 656 963
 `,
@@ -30,19 +27,8 @@ func TestInsertionSort(t *testing.T) {
 	for _, testcase := range insertionSortTests {
 		t.Log(testcase.name)
 
-		f, err := os.Create(testcase.file)
-		if err != nil {
-			t.Errorf("could not create a file: %s\n  %s", testcase.file, err)
-		}
-		f.WriteString(testcase.text)
-		f.Close()
-
-		f, err = os.Open(testcase.file)
-		if err != nil {
-			t.Errorf("could not open a file: %s\n  %s", testcase.file, err)
-		}
-
-		sc := bufio.NewScanner(f)
+		r := strings.NewReader(testcase.text)
+		sc := bufio.NewScanner(r)
 		N := 0
 		if sc.Scan() {
 			N, _ = strconv.Atoi(sc.Text())
@@ -53,33 +39,22 @@ func TestInsertionSort(t *testing.T) {
 				A[i], _ = strconv.Atoi(s)
 			}
 		}
-		f.Close()
 
 		if result := insertionSort(A, N); !reflect.DeepEqual(result, testcase.want) {
 			t.Errorf("result => %#v\n, want => %#v", result, testcase.want)
-		}
-
-		if err := os.Remove(testcase.file); err != nil {
-			t.Errorf("could not delete a file: %s\n  %s\n", testcase.file, err)
 		}
 	}
 }
 
 func BenchmarkInsertionSort(b *testing.B) {
-	for _, testcase := range insertionSortTests {
-		f, err := os.Create(testcase.file)
-		if err != nil {
-			b.Errorf("could not create a file: %s\n  %s", testcase.file, err)
-		}
-		f.WriteString(testcase.text)
-		f.Close()
-	}
-
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for _, testcase := range insertionSortTests {
-			f, _ := os.Open(testcase.file)
-			sc := bufio.NewScanner(f)
+			b.StopTimer()
+			r := strings.NewReader(testcase.text)
+			b.StartTimer()
+
+			sc := bufio.NewScanner(r)
 			N := 0
 			if sc.Scan() {
 				N, _ = strconv.Atoi(sc.Text())
@@ -90,7 +65,6 @@ func BenchmarkInsertionSort(b *testing.B) {
 					A[i], _ = strconv.Atoi(s)
 				}
 			}
-			f.Close()
 
 			// insertion sort
 			for i := 1; i < N; i++ {
@@ -102,12 +76,6 @@ func BenchmarkInsertionSort(b *testing.B) {
 				}
 				A[j+1] = v
 			}
-		}
-	}
-
-	for _, testcase := range insertionSortTests {
-		if err := os.Remove(testcase.file); err != nil {
-			b.Errorf("could not delete a file: %s\n  %s\n", testcase.file, err)
 		}
 	}
 }

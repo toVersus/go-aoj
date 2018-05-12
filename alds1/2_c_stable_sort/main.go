@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -15,7 +16,7 @@ type card struct {
 
 type cards []card
 
-func newCards(fd *os.File) (cards, int) {
+func newCards(fd io.Reader) (cards, int) {
 	N := 0
 	sc := bufio.NewScanner(fd)
 	if sc.Scan() {
