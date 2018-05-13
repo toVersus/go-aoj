@@ -48,6 +48,7 @@ func answer(r io.Reader) int {
 }
 
 func search(A []int, n, key int) bool {
+	// add sentinel to the end of the slice to reduce the nest of conditions.
 	A = append(A, key)
 	i := 0
 	for A[i] != key {
