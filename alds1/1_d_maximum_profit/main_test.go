@@ -9,6 +9,8 @@ import (
 // The way of testing fmt.Scan is inspired by the following comparison document:
 // https://gist.github.com/billhathaway/c8467ebcd2aa8c21d2d2
 
+var result int
+
 var profitTests = []struct {
 	name string
 	file string
@@ -42,16 +44,15 @@ func TestGetMaxProfitByFscan(t *testing.T) {
 
 func BenchmarkGetMaxProfitByFscan(b *testing.B) {
 	b.ResetTimer()
+	var max int
 	for i := 0; i < b.N; i++ {
-		for _, testcase := range profitTests {
-			b.StopTimer()
-			r := strings.NewReader(testcase.text)
-			b.StartTimer()
+		b.StopTimer()
+		r := strings.NewReader(profitTests[0].text)
+		b.StartTimer()
 
-			getMaxProfitByFscan(r)
-		}
+		max = getMaxProfitByFscan(r)
 	}
-	b.StopTimer()
+	result = max
 }
 
 func TestGetMaxProfitByScanner(t *testing.T) {
@@ -66,13 +67,14 @@ func TestGetMaxProfitByScanner(t *testing.T) {
 }
 
 func BenchmarkGetMaxProfitByScanner(b *testing.B) {
+	b.ResetTimer()
+	var max int
 	for i := 0; i < b.N; i++ {
-		for _, testcase := range profitTests {
-			b.StopTimer()
-			r := strings.NewReader(testcase.text)
-			b.StartTimer()
+		b.StopTimer()
+		r := strings.NewReader(profitTests[0].text)
+		b.StartTimer()
 
-			getMaxProfitByScannerAtoi(r)
-		}
+		max = getMaxProfitByScannerAtoi(r)
 	}
+	result = max
 }

@@ -29,14 +29,12 @@ func getMaxProfitByFscan(r io.Reader) int {
 }
 
 func getMaxProfitByScannerAtoi(r io.Reader) int {
-	n, val, minv, maxv := 0, 0, 0, -2147483648
+	val, maxv := 0, -2147483648
 	sc := bufio.NewScanner(r)
-	if sc.Scan() {
-		n, _ = strconv.Atoi(sc.Text())
-	}
-	if sc.Scan() {
-		minv, _ = strconv.Atoi(sc.Text())
-	}
+	sc.Scan()
+	n, _ := strconv.Atoi(sc.Text())
+	sc.Scan()
+	minv, _ := strconv.Atoi(sc.Text())
 	for i := 1; i < n; i++ {
 		sc.Scan()
 		val, _ = strconv.Atoi(sc.Text())
