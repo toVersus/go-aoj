@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Node struct {
@@ -14,38 +15,27 @@ type Node struct {
 	parent, left, right *Node
 }
 
-var (
-	out bytes.Buffer
-)
+var out bytes.Buffer
 
 func (n *Node) insert(k int) {
-	x := n
-	var y *Node
-	z := &Node{
-		key:   k,
-		left:  &Node{},
-		right: &Node{},
-	}
+	root := n
+	var target *Node
+	node := &Node{key: k, left: nil, right: nil}
 
-	for x != nil {
-		y = x
-		if z.key < x.key {
-			x = x.left
+	for root != nil {
+		target = root
+		if root.key > k {
+			root = root.left
 			continue
 		}
-		x = x.right
+		root = root.right
 	}
 
-	z.parent = y
-	if y == nil {
-		n = z
+	if target.key > node.key {
+		target.left = node
 		return
 	}
-	if z.key < y.key {
-		y.left = z
-		return
-	}
-	y.right = z
+	target.right = node
 }
 
 func (n *Node) inorder() {
@@ -90,10 +80,11 @@ func answer(reader io.Reader) string {
 			root.inorder()
 			out.WriteString("\n")
 			root.preorder()
+			out.WriteString("\n")
 		}
 	}
 
-	return out.String()
+	return strings.TrimRight(out.String(), "\n")
 }
 
 func main() {
